@@ -26,11 +26,11 @@ int setDate(uart_port_t UART_NUM, char* date){
 }
 
 int createFile(uart_port_t UART_NUM, char* filename){
-    char command[40] = "$WRITE ";
+    char command[100] = "$WRITE ";
     strcat(command, filename);
     strcat(command, "\r");
     int r = sendData(UART_NUM, command);
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
     return r;
 }
 
@@ -47,7 +47,9 @@ int writeOnFile(uart_port_t UART_NUM, char* s, int ssize){
     char *ns = (char*)malloc((ssize+2)*sizeof(char));
     strcpy(ns,s);
     strcat(ns, "\r");
-    return sendData(UART_NUM, ns);
+    int r = sendData(UART_NUM, ns);
+    vTaskDelay(300 / portTICK_PERIOD_MS);
+    return r;
 }
 
 int closeFile(uart_port_t UART_NUM){
@@ -61,7 +63,9 @@ int dir(uart_port_t UART_NUM, char* filename){
     char command[40] = "$DIR ";
     strcat(command, filename);
     strcat(command, "\r");
-    return sendData(UART_NUM_1, command);
+    int r = sendData(UART_NUM_1, command);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    return r;
 }
 
 int fileSize(uart_port_t UART_NUM, char* filename, int mode){
@@ -164,6 +168,33 @@ int renameFile(uart_port_t UART_NUM, char* oldname, char* newname){
     strcat(command, oldname);
     strcat(command, " ");
     strcat(command, newname);
+    strcat(command, "\r");
+    int r = sendData(UART_NUM, command);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    return r;
+}
+
+int makeDir(uart_port_t UART_NUM, char* dirname){
+    char command[50] = "$MD ";
+    strcat(command, dirname);
+    strcat(command, "\r");
+    int r = sendData(UART_NUM, command);
+    vTaskDelay(1500 / portTICK_PERIOD_MS);
+    return r;
+}
+
+int changeDir(uart_port_t UART_NUM, char* dirname){
+    char command[50] = "$CD ";
+    strcat(command, dirname);
+    strcat(command, "\r");
+    int r = sendData(UART_NUM, command);
+    vTaskDelay(1500 / portTICK_PERIOD_MS);
+    return r;
+}
+
+int removeDir(uart_port_t UART_NUM, char* dirname){
+    char command[50] = "$RD ";
+    strcat(command, dirname);
     strcat(command, "\r");
     int r = sendData(UART_NUM, command);
     vTaskDelay(1000 / portTICK_PERIOD_MS);

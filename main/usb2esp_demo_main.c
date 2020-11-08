@@ -32,9 +32,10 @@ static void tx_task(void *arg)
     uart_port_t UART_USB = UART_NUM_1;
     vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-    //write mode functions
     setTime(UART_USB, "12:00:00");
     setDate(UART_USB, "2020-11-05");
+
+    /*
 
     // Create the file ESP.TXT
     createFile(UART_USB, "filename.txt");
@@ -78,6 +79,30 @@ static void tx_task(void *arg)
     readFile(UART_USB, "filecopy.txt");
     renameFile(UART_USB, "filecopy.txt", "renamed.txt");
     dir(UART_USB, "*.txt");
+    */
+
+    // changeDir(UART_USB, "..");
+    dir(UART_USB, "");
+    removeDir(UART_USB, "newdir");
+    dir(UART_USB, "");
+    makeDir(UART_USB, "newdir");
+    dir(UART_USB, "");
+    changeDir(UART_USB, "newdir");
+    dir(UART_USB, "");
+
+    createFile(UART_USB, "file.txt");
+    char *ms = "Writing some stuff";
+    writeOnFile(UART_USB, ms, strlen(ms));
+    closeFile(UART_USB);
+    // dir(UART_USB, "");
+
+    
+    // dir(UART_USB, "*.txt");
+    changeDir(UART_USB, "..");
+    createFile(UART_USB, "file2.txt");
+    writeOnFile(UART_USB, ms, strlen(ms));
+    closeFile(UART_USB);
+    dir(UART_USB, "");
 
 
 

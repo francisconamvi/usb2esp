@@ -37,4 +37,10 @@ int delFile(uart_port_t UART_NUM, char* filename);
 
 int renameFile(uart_port_t UART_NUM, char* oldname, char* newname);
 
+int makeDir(uart_port_t UART_NUM, char* dirname);
+
+int changeDir(uart_port_t UART_NUM, char* dirname);
+
+int removeDir(uart_port_t UART_NUM, char* dirname);
+
 #endif
