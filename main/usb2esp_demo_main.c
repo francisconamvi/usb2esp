@@ -9,6 +9,7 @@
 
 #define RX1_PIN (GPIO_NUM_16)
 #define TX1_PIN (GPIO_NUM_17)
+#define SS (GPIO_NUM_4)
 
 static const int RX_BUF_SIZE = 1024;
 
@@ -25,6 +26,8 @@ void init(void) {
     uart_param_config(UART_NUM_1, &uart_config_1);
     uart_set_pin(UART_NUM_1, TX1_PIN, RX1_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 
+    gpio_set_direction( SS, GPIO_MODE_INPUT );
+	gpio_set_pull_mode( SS, GPIO_PULLUP_ONLY );
 }
 
 static void tx_task(void *arg)
@@ -34,6 +37,10 @@ static void tx_task(void *arg)
 
     setTime(UART_USB, "12:00:00");
     setDate(UART_USB, "2020-11-05");
+
+    while(!gpio_get_level(SS)){
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+    }
 
     /*
 
@@ -109,6 +116,9 @@ static void tx_task(void *arg)
 
     while (1) {
         vTaskDelay(1000 / portTICK_PERIOD_MS);
+        if(!gpio_get_level(SS)){
+            esp_restart();
+        }
     }
 }
 
