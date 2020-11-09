@@ -35,7 +35,7 @@ int createFile(uart_port_t UART_NUM, char* filename){
 }
 
 int appendFile(uart_port_t UART_NUM, char* filename){
-    char command[40] = "$APPEND ";
+    char command[100] = "$APPEND ";
     strcat(command, filename);
     strcat(command, "\r");
     int r = sendData(UART_NUM, command);
@@ -195,6 +195,15 @@ int changeDir(uart_port_t UART_NUM, char* dirname){
 int removeDir(uart_port_t UART_NUM, char* dirname){
     char command[50] = "$RD ";
     strcat(command, dirname);
+    strcat(command, "\r");
+    int r = sendData(UART_NUM, command);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    return r;
+}
+
+int setBaud(uart_port_t UART_NUM, char* baudrate){
+    char command[20] = "$BAUD ";
+    strcat(command, baudrate);
     strcat(command, "\r");
     int r = sendData(UART_NUM, command);
     vTaskDelay(1000 / portTICK_PERIOD_MS);

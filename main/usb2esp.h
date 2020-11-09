@@ -43,4 +43,6 @@ int changeDir(uart_port_t UART_NUM, char* dirname);
 
 int removeDir(uart_port_t UART_NUM, char* dirname);
 
+int setBaud(uart_port_t UART_NUM, char* baudrate);
+
 #endif
