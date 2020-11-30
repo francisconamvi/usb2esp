@@ -38,11 +38,11 @@ static void tx_task(void *arg)
     vTaskDelay(1000 / portTICK_PERIOD_MS);
 
     //Wait to put pendrive
-    while(!gpio_get_level(SS)){
-        vTaskDelay(500 / portTICK_PERIOD_MS);
-    }
+    // while(!gpio_get_level(SS)){
+    //     vTaskDelay(500 / portTICK_PERIOD_MS);
+    // }
     //Set Baud Rate (default = 9600)
-    // setBaud(UART_USB, "9600"); 
+    //setBaud(UART_USB, "9600"); 
 
     //Set Time and Date
     setTime(UART_USB, "12:00:00");
@@ -56,6 +56,7 @@ static void tx_task(void *arg)
     */
     int ex = 1; 
     if(ex==1){
+        delFile(UART_USB, "filename.txt");
         createFile(UART_USB, "filename.txt");
         for(int i=0;i<3;i++){
             char *mystring = "Writing some stuff";
@@ -103,9 +104,9 @@ static void tx_task(void *arg)
     while (1) {
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         // If pendrive is out, restart
-        if(!gpio_get_level(SS)){
-            esp_restart();
-        }
+        // if(!gpio_get_level(SS)){
+        //     esp_restart();
+        // }
     }
 }
 
