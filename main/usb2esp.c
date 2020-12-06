@@ -6,8 +6,9 @@ int sendData(uart_port_t UART_NUM, const char* data)
 {
     const int len = strlen(data);
     const int txBytes = uart_write_bytes(UART_NUM, data, len);
-    ESP_LOGI("TO_USB", "Wrote %d bytes - %s", txBytes, data);
-    vTaskDelay(100 / portTICK_PERIOD_MS);
+    ESP_LOGI("TO_USB", "Wrote %d bytes", txBytes);
+    // ESP_LOGI("TO_USB", "Wrote %d bytes - %s", txBytes, data);
+    vTaskDelay(300 / portTICK_PERIOD_MS);
     return txBytes;
 }
 
@@ -39,15 +40,13 @@ int appendFile(uart_port_t UART_NUM, char* filename){
     strcat(command, filename);
     strcat(command, "\r");
     int r = sendData(UART_NUM, command);
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
     return r;
 }
 
 int writeOnFile(uart_port_t UART_NUM, char* s, int ssize){
-    char *ns = (char*)malloc((ssize+2)*sizeof(char));
-    strcpy(ns,s);
-    strcat(ns, "\r");
-    int r = sendData(UART_NUM, ns);
+    // strcat(s, "\r");
+    int r = sendData(UART_NUM, s);
     vTaskDelay(300 / portTICK_PERIOD_MS);
     return r;
 }
@@ -206,6 +205,6 @@ int setBaud(uart_port_t UART_NUM, char* baudrate){
     strcat(command, baudrate);
     strcat(command, "\r");
     int r = sendData(UART_NUM, command);
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
     return r;
 }
