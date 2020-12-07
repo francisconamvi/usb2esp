@@ -27,7 +27,7 @@ static void IRAM_ATTR soft_isr_handler(void* arg)
 void init(void) {
     /*uart configuration*/
     const uart_config_t uart_config_1 = {
-        .baud_rate = 57600,
+        .baud_rate = 57600, //here you need to write the current baud rate of breakout
         .data_bits = UART_DATA_8_BITS,
         .parity = UART_PARITY_DISABLE,
         .stop_bits = UART_STOP_BITS_1,
@@ -50,23 +50,22 @@ static void tx_task(void *arg)
 {
     uart_port_t UART_USB = UART_NUM_1;
     vTaskDelay(2000 / portTICK_PERIOD_MS);
-    // closeFile(UART_USB);
 
-    //Wait to put pendrive
+    // Wait to put pendrive
     // while(!gpio_get_level(SS)){
     //     vTaskDelay(500 / portTICK_PERIOD_MS);
     // }
 
-    // setBaud(UART_USB, "9600");
-    // const uart_config_t uart_config_1 = {
-    //     .baud_rate = 9600,
-    //     .data_bits = UART_DATA_8_BITS,
-    //     .parity = UART_PARITY_DISABLE,
-    //     .stop_bits = UART_STOP_BITS_1,
-    //     .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
-    //     .source_clk = UART_SCLK_APB,
-    // };
-    // uart_param_config(UART_NUM_1, &uart_config_1);
+    setBaud(UART_USB, "57600"); //here you write the baudrate you want to chance for
+    const uart_config_t uart_config_1 = {
+        .baud_rate = 57600, //here you write the baudrate you want to chance for
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+        .source_clk = UART_SCLK_APB,
+    };
+    uart_param_config(UART_NUM_1, &uart_config_1);
     vTaskDelay(1000 / portTICK_PERIOD_MS);
 
     /* Example modes
@@ -75,8 +74,9 @@ static void tx_task(void *arg)
     ex = 2 -> Read files
     ex = 3 -> Copy, delete and rename files
     ex = 4 -> Directories operations
+    ex = 5 -> Writing long string
     */
-    int ex = 0;
+    int ex = 5; //TODO: change here to see examples
     if(ex==0){
         sendData(UART_USB, "HELP\r");
         vTaskDelay(3000 / portTICK_PERIOD_MS);
@@ -95,40 +95,44 @@ static void tx_task(void *arg)
         closeFile(UART_USB);
 
         appendFile(UART_USB, "filename.txt");
-
-        long int n = 128000;
-        char *mystring = (char*)malloc((n+1)*sizeof(char));
-        for(long int i = 0; i<n; i++){
-            if(i%10 == 0){
-                mystring[i] = '\n';
-            }
-            else if(i%10 == 1){
-                mystring[i] = '\r';
-            }
-            else{
-                char aux[2];
-                itoa(i%10, aux, 10);
-                mystring[i] = aux[0];
-            }
+        for(int i=0;i<3;i++){
+            char *mystring = "More stuff";
+            writeOnFile(UART_USB, mystring, strlen(mystring));
         }
-        mystring[n] = '\0';
-        printf("%d\n", strlen(mystring));
-        writeOnFile(UART_USB, mystring, n+1);
         closeFile(UART_USB);
     }
     else if(ex==2){
         fileSize(UART_USB, "filename.txt", LINE);
-        // readFile(UART_USB, "filename.txt"); //exemple file is too big
-        readLine(UART_USB, "filename.txt", 0);
+        readFile(UART_USB, "filename.txt");
+        readLine(UART_USB, "filename.txt", 3);
         readNextLine(UART_USB, "filename.txt");
         readSection(UART_USB, "filename.txt", 0, 7);
         readNextSection(UART_USB, "filename.txt", 11);
     }
     else if(ex==3){
-        copyFile(UART_USB, "filename.txt", "filecopy.txt");
-        delFile(UART_USB, "filename.txt");
+
+        delFile(UART_USB, "filecopy.txt");
+        delFile(UART_USB, "renamed.txt");
+        delFile(UART_USB, "file.txt");
+
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+        dir(UART_USB, "*.txt");
+
+        createFile(UART_USB, "file.txt");
+        char *mystring = "Hello World\n\r";
+        writeOnFile(UART_USB, mystring, strlen(mystring));
+        closeFile(UART_USB);
+
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+        copyFile(UART_USB, "file.txt", "filecopy.txt");
+        renameFile(UART_USB, "file.txt", "renamed.txt");
+
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
+
         readFile(UART_USB, "filecopy.txt");
-        renameFile(UART_USB, "filecopy.txt", "renamed.txt");
+        readFile(UART_USB, "renamed.txt");
     }
     else if(ex==4){
         dir(UART_USB, "");
@@ -144,6 +148,36 @@ static void tx_task(void *arg)
         closeFile(UART_USB);
         changeDir(UART_USB, "..");
         dir(UART_USB, "");
+    }
+    else if(ex==5){
+        delFile(UART_USB, "long.txt");
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+        long int n = 128000;
+        char *mystring = (char*)malloc((n+1)*sizeof(char));
+        for(long int i = 0; i<n; i++){
+            if(i%10 == 8){
+                mystring[i] = '\n';
+            }
+            else if(i%10 == 9){
+                mystring[i] = '\r';
+            }
+            else{
+                char aux[2];
+                itoa(i%10, aux, 10);
+                mystring[i] = aux[0];
+            }
+        }
+        mystring[n] = '\0';
+        printf("%d\n", strlen(mystring));
+
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        createFile(UART_USB, "long.txt");
+        writeOnFile(UART_USB, mystring, n+1);
+        closeFile(UART_USB);
+
+        vTaskDelay(3000 / portTICK_PERIOD_MS);
+        fileSize(UART_USB, "long.txt", LINE);
     }
 
     while (1) {
