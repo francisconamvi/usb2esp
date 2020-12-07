@@ -49,7 +49,9 @@ There are 5 examples:
 
 - ex = 4 -> Directories operations
 
-**Note:** In ex 1, we write a big string. We did this to show that the function `uart_write_bytes`feed WDT, and we don't have to worry about this.
+- ex = 5 -> Write 128KB string
+
+**Note:** In ex 5, we write a big string. We did this to show that the function `uart_write_bytes` feed WDT, and we don't have to worry about this.
   
 
 ## Functions
