@@ -201,10 +201,10 @@ int removeDir(uart_port_t UART_NUM, char* dirname){
 }
 
 int setBaud(uart_port_t UART_NUM, char* baudrate){
-    char command[20] = "$BAUD ";
+    char command[20] = "BAUD ";
     strcat(command, baudrate);
     strcat(command, "\r");
     int r = sendData(UART_NUM, command);
-    vTaskDelay(2000 / portTICK_PERIOD_MS);
+    vTaskDelay(3000 / portTICK_PERIOD_MS);
     return r;
 }

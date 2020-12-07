@@ -27,7 +27,7 @@ static void IRAM_ATTR soft_isr_handler(void* arg)
 void init(void) {
     /*uart configuration*/
     const uart_config_t uart_config_1 = {
-        .baud_rate = 9600,
+        .baud_rate = 57600,
         .data_bits = UART_DATA_8_BITS,
         .parity = UART_PARITY_DISABLE,
         .stop_bits = UART_STOP_BITS_1,
@@ -50,41 +50,46 @@ static void tx_task(void *arg)
 {
     uart_port_t UART_USB = UART_NUM_1;
     vTaskDelay(2000 / portTICK_PERIOD_MS);
-    closeFile(UART_USB);
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    // closeFile(UART_USB);
 
     //Wait to put pendrive
     // while(!gpio_get_level(SS)){
     //     vTaskDelay(500 / portTICK_PERIOD_MS);
     // }
 
-    setBaud(UART_USB, "57600");
-    const uart_config_t uart_config_1 = {
-        .baud_rate = 57600,
-        .data_bits = UART_DATA_8_BITS,
-        .parity = UART_PARITY_DISABLE,
-        .stop_bits = UART_STOP_BITS_1,
-        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
-        .source_clk = UART_SCLK_APB,
-    };
-    uart_param_config(UART_NUM_1, &uart_config_1);
-
-    //Set Time and Date
-    setTime(UART_USB, "12:00:00");
-    setDate(UART_USB, "2020-11-05");
+    // setBaud(UART_USB, "9600");
+    // const uart_config_t uart_config_1 = {
+    //     .baud_rate = 9600,
+    //     .data_bits = UART_DATA_8_BITS,
+    //     .parity = UART_PARITY_DISABLE,
+    //     .stop_bits = UART_STOP_BITS_1,
+    //     .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+    //     .source_clk = UART_SCLK_APB,
+    // };
+    // uart_param_config(UART_NUM_1, &uart_config_1);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
 
     /* Example modes
+    ex = 0 -> Test to see current Baud Rate
     ex = 1 -> Create file and write
     ex = 2 -> Read files
     ex = 3 -> Copy, delete and rename files
     ex = 4 -> Directories operations
     */
-    int ex = 2;
-    if(ex==1){
+    int ex = 0;
+    if(ex==0){
+        sendData(UART_USB, "HELP\r");
+        vTaskDelay(3000 / portTICK_PERIOD_MS);
+    }
+    else if(ex==1){
+        //Set Time and Date
+        setTime(UART_USB, "12:00:00");
+        setDate(UART_USB, "2020-11-05");
+
         delFile(UART_USB, "filename.txt");
         createFile(UART_USB, "filename.txt");
         for(int i=0;i<3;i++){
-            char *mystring = "Writing some stuff";
+            char *mystring = "Writing some stuff\n\r";
             writeOnFile(UART_USB, mystring, strlen(mystring));
         }
         closeFile(UART_USB);
@@ -114,7 +119,7 @@ static void tx_task(void *arg)
     else if(ex==2){
         fileSize(UART_USB, "filename.txt", LINE);
         // readFile(UART_USB, "filename.txt"); //exemple file is too big
-        readLine(UART_USB, "filename.txt", 3);
+        readLine(UART_USB, "filename.txt", 0);
         readNextLine(UART_USB, "filename.txt");
         readSection(UART_USB, "filename.txt", 0, 7);
         readNextSection(UART_USB, "filename.txt", 11);

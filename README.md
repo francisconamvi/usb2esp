@@ -23,17 +23,23 @@ The [hobbytronics webpage](https://hobbytronics.co.uk/usb-host-flash-drive) prov
 
 In main/usb2esp_demo_main.c we have some tasks
  - ledt
+
  Task that blink a led to show esp is working
  - bomber
+ 
  Task that call software interruption every 10ms. The ideia is to interrupt uart as much as possible
  - rx_task
+ 
  Task that wait for messages from USB.
  - tx_task
+ 
  Task that send commands for USB.
 
 In tx_task I wrote some examples of how to use each functions.
 
-There are 4 examples:
+There are 5 examples:
+
+- ex = 0 -> Just show help, in terminal mode. It's usefull to test Baud Rate
 
 - ex = 1 -> Create file and write
 
